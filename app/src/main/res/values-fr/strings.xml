@@ -3,4 +3,13 @@
     <string name="app_name">AndroidLabs</string>
     <string name="hello_world">Bonjour le monde</string>
     <string name="button_text">Je suis un bouton!</string>
+    <string name="iloveandroid">J\'aime Androïd</string>
+    <string name="pressme">APPUYEZ SUR MOI</string>
+    <string name="checkthisout">Regarde ça!</string>
+    <string name="toast_message">L\'étiquette a été mise à jour.</string>
+    <string name="undo">Annuler</string>
+    <string name="seton">La case est cochée</string>
+    <string name="setoff">La case à cocher est désactivée</string>
+    <string name="onoff">Allumer / éteindre</string>
+    <string name="flag">Drapeau de Français</string>
 </resources>
