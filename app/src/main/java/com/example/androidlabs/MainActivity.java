@@ -2,46 +2,56 @@ package com.example.androidlabs;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.google.android.material.snackbar.Snackbar;
+
 
 public class MainActivity extends AppCompatActivity {
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == 1) {
+                finish();
+            }
+        }
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main_linear);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        SharedPreferences sh = getSharedPreferences("MySharedPref", MODE_PRIVATE);
 
-            TextView title = findViewById(R.id.text);
+// The value will be default as empty string because for
+// the very first time when the app is opened, there is nothing to show
+        String welcome = sh.getString("welcome", "");
 
-            EditText edittext = findViewById(R.id.textView);
+// We can then use the data
+        EditText editText = findViewById(R.id.editText);
+        editText.setText(welcome);
+        Button button = findViewById(R.id.button);
 
-            final Button btn = findViewById(R.id.button2);
-            btn.setOnClickListener((click) -> {
-                title.setText(edittext.getText().toString());
-                Toast.makeText(MainActivity.this, R.string.toast_message, Toast.LENGTH_LONG).show();
-            });
+        button.setOnClickListener( click -> {
+            Intent nextPage = new Intent(this,NameActivity.class);
+            String content = editText.getText().toString();
+            nextPage.putExtra("welcome",content);
+            startActivityForResult(nextPage,0);
+        });
 
-            CheckBox cb = findViewById(R.id.checkBox);
-            cb.setOnCheckedChangeListener((cpb, b) -> Snackbar.make(findViewById(R.id.layout), setOnOff(b), Snackbar.LENGTH_LONG)
-                    .setAction(R.string.undo, click -> cpb.setChecked(!b))
-                    .show());
+    }
 
-
-        }
-
-    public int setOnOff(boolean b) {
-        if (b) {
-            return R.string.seton;
-        } else {
-            return R.string.setoff;
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref",MODE_PRIVATE);
+        SharedPreferences.Editor myEdit = sharedPreferences.edit();
+        EditText editText = findViewById(R.id.editText);
+        myEdit.putString("welcome", editText.getText().toString());
+        myEdit.commit();
     }
     }

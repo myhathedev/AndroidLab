@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AndroidLabs</string>
-    <string name="hello_world">Bonjour le monde</string>
-    <string name="button_text">Je suis un bouton!</string>
-    <string name="iloveandroid">J\'aime Androïd</string>
-    <string name="pressme">APPUYEZ SUR MOI</string>
-    <string name="checkthisout">Regarde ça!</string>
-    <string name="toast_message">L\'étiquette a été mise à jour.</string>
-    <string name="undo">Annuler</string>
-    <string name="seton">La case est cochée</string>
-    <string name="setoff">La case à cocher est désactivée</string>
-    <string name="onoff">Allumer / éteindre</string>
-    <string name="flag">Drapeau de Français</string>
+    <string name="enter_name">Entrez votre nom</string>
+    <string name="button_text">Allez Ensuite !</string>
+    <string name="button_text_2">NE M\'APPELLE PAS COMME ÇA</string>
+    <string name="button_text_3">MERCI</string>
 </resources>
