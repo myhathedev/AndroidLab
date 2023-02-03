@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AndroidLabs</string>
+    <string name="app_name">LABO 4</string>
     <string name="enter_name">Entrez votre nom</string>
     <string name="button_text">Allez Ensuite !</string>
     <string name="button_text_2">NE M\'APPELLE PAS COMME ÇA</string>
     <string name="button_text_3">MERCI</string>
+    <string name="addbutton">AJOUTER</string>
+    <string name="urgentsw">URGENT</string>
+    <string name="type">Écrivez Ici</string>
+    <string name="rowline">La ligne sélectionnée est: </string>
+    <string name="delete">Voulez-vous supprimer ceci ?</string>
+    <string name="yes">Qui</string>
+    <string name="no">Non</string>
 </resources>

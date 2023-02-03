@@ -1,7 +1,17 @@
 <resources>
-    <string name="app_name">AndroidLabs</string>
+    <string name="app_name">Lab 4</string>
     <string name="enter_name">Enter your name</string>
     <string name="button_text">NEXT</string>
     <string name="button_text_2">DON\'T CALL ME THAT</string>
     <string name="button_text_3">THANK YOU</string>
+    <string name="addbutton">ADD</string>
+    <string name="urgentsw">URGENT</string>
+    <string name="type">Type Here</string>
+    <string name="rowline">The selected row is: </string>
+    <string name="delete">Do you want to delete this?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+
+
 </resources>
