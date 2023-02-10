@@ -20,8 +20,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     static class object {
         String text;
-        Boolean urgent;
-        public object(String text, Boolean urgent) {
+        String urgent;
+        public object(String text, String urgent) {
             this.text = text;
             this.urgent = urgent;
         }
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 TextView tView = newView.findViewById(R.id.textGoesHere);
                 tView.setText(elements.get(position).text);
-                if (elements.get(position).urgent) {
+                if (elements.get(position).urgent=="true") {
                     tView.setBackgroundColor(Color.RED);
                     tView.setTextColor(Color.WHITE);
                 } else {
@@ -74,17 +74,17 @@ public class MainActivity extends AppCompatActivity {
             String extraText = R.string.rowline + String.valueOf(position);
             ((TextView)extraViewStuff.findViewById(R.id.textGoesHere)).setText(extraText);
 
-                    AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
-                    aDialog.setMessage(R.string.delete)
-                            .setPositiveButton(R.string.yes, (click, arg) -> {
-                                elements.remove(position);
-                                myAdapter.notifyDataSetChanged();
-                            })
-                            .setNegativeButton(R.string.no, (click, arg) -> {
-                            })
-                            .setView(extraViewStuff)
-                            .create()
-                            .show();
+            AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
+            aDialog.setMessage(R.string.delete)
+                    .setPositiveButton(R.string.yes, (click, arg) -> {
+                        elements.remove(position);
+                        myAdapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton(R.string.no, (click, arg) -> {
+                    })
+                    .setView(extraViewStuff)
+                    .create()
+                    .show();
             return true;
         });
 
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         addButton.setOnClickListener(click ->
         {
             EditText addElement = findViewById(R.id.typeHere);
-            object obj = new object(addElement.getText().toString(),sw.isChecked());
+            object obj = new object(addElement.getText().toString(),String.valueOf(sw.isChecked()));
             if (sw.isChecked()) {
                 sw.setChecked(false);
             }
@@ -108,4 +108,4 @@ public class MainActivity extends AppCompatActivity {
         swiperefresh.setOnRefreshListener(()-> swiperefresh.setRefreshing(false));
 
     }
-    }
+}
