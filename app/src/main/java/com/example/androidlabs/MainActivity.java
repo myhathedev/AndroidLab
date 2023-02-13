@@ -3,6 +3,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,8 +29,13 @@ public class MainActivity extends AppCompatActivity {
             this.urgent = urgent;
         }
     }
-    ArrayList<object> elements = new ArrayList<>();
+    static ArrayList<object> elements = new ArrayList<>();
+    static ArrayList<String> taskList = new ArrayList<>();
+    static ArrayList<Integer> idlist = new ArrayList<>();
+    static ArrayList<String> urgentlist = new ArrayList<>();
     DBHelper db ;
+
+
 
 //---------------------On create-----------------------
     @Override
@@ -37,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db = new DBHelper(this);
-
+        resetElements();
+        Cursor c = db.getCursor();
+        db.printCursor(c);
         //-----------Adapter--------------------
         class MyListAdapter extends BaseAdapter {
 
@@ -48,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 return position;}
 
             public long getItemId(int position) {
-                return (long) position;}
+                return position;}
 
             public View getView(int position, View old, ViewGroup parent) {
                 View newView = old;
@@ -57,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     newView = inflater.inflate(R.layout.row_layout, parent, false);
                 }
                 TextView tView = newView.findViewById(R.id.textGoesHere);
-                String setText= String.valueOf(elements.get(position).id);
+                String setText= String.valueOf(elements.get(position).text);
                 tView.setText(setText);
                 String urgentValue = elements.get(position).urgent;
                 if (urgentValue.equals("true")) {
@@ -72,14 +80,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //----------------Back to main-------------------------------
 
-        ArrayList<String> taskList = db.getAllTask();
-        ArrayList<Integer> idlist = db.getAllId();
-        ArrayList<String> urgentlist = db.getAllUrgent();
-        int listsize = db.numberOfRows();
-        for (int i=0;i<listsize;i++) {
-            object obj = new object(idlist.get(i),taskList.get(i),urgentlist.get(i));
-            elements.add(obj);
-        }
+
 
         ListView todolist = findViewById(R.id.toDoList);
         MyListAdapter myAdapter = new MyListAdapter();
@@ -92,12 +93,11 @@ public class MainActivity extends AppCompatActivity {
         addButton.setOnClickListener(click ->
         {
             EditText addElement = findViewById(R.id.typeHere);
-            object obj = new object(db.getMaxId()+1,addElement.getText().toString(),String.valueOf(sw.isChecked()));
             String newTask = addElement.getText().toString();
             String newUrgent = String.valueOf(sw.isChecked());
-            elements.add(obj);
             addElement.setText(null);
             db.insertTask(newTask,newUrgent);
+            resetElements();
             if (sw.isChecked()) {
                 sw.setChecked(false);
             }
@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
             aDialog.setMessage(R.string.delete)
                     .setPositiveButton(R.string.yes, (click, arg) -> {
-                        elements.remove(position);
                         db.deleteTask(elements.get(position).id);
+                        resetElements();
                         myAdapter.notifyDataSetChanged();
                     })
                     .setNegativeButton(R.string.no, (click, arg) -> {
@@ -130,5 +130,17 @@ public class MainActivity extends AppCompatActivity {
         SwipeRefreshLayout swipeRefresh = findViewById(R.id.swiperefresh);
         swipeRefresh.setOnRefreshListener(()-> swipeRefresh.setRefreshing(false));
 
+    }
+
+    protected void resetElements() {
+        elements.clear();
+        taskList = db.getAllTask();
+        idlist = db.getAllId();
+        urgentlist = db.getAllUrgent();
+        int listSize = db.numberOfRows();
+        for (int i = 0; i < listSize; i++) {
+            object obj = new object(idlist.get(i), taskList.get(i), urgentlist.get(i));
+            elements.add(obj);
+        }
     }
 }
