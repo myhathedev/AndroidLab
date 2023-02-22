@@ -46,6 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return true;
     }
 
+
     public void printCursor(Cursor res) {
         SQLiteDatabase db = this.getReadableDatabase();
         int version = db.getVersion();

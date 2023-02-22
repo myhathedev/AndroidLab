@@ -1,146 +1,111 @@
 package com.example.androidlabs;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.database.Cursor;
-import android.graphics.Color;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.TextView;
-import java.util.ArrayList;
-
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    static class object {
-        int id;
-        String text;
-        String urgent;
-        public object(int id,String text, String urgent) {
-            this.id = id;
-            this.text = text;
-            this.urgent = urgent;
-        }
-    }
-    static ArrayList<object> elements = new ArrayList<>();
-    static ArrayList<String> taskList = new ArrayList<>();
-    static ArrayList<Integer> idlist = new ArrayList<>();
-    static ArrayList<String> urgentlist = new ArrayList<>();
-    DBHelper db ;
-
-
 
 //---------------------On create-----------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        db = new DBHelper(this);
-        resetElements();
-        Cursor c = db.getCursor();
-        db.printCursor(c);
-        //-----------Adapter--------------------
-        class MyListAdapter extends BaseAdapter {
 
-            public int getCount() {
-                return elements.size();}
-
-            public Object getItem(int position) {
-                return position;}
-
-            public long getItemId(int position) {
-                return position;}
-
-            public View getView(int position, View old, ViewGroup parent) {
-                View newView = old;
-                LayoutInflater inflater = getLayoutInflater();
-                if (newView == null) {
-                    newView = inflater.inflate(R.layout.row_layout, parent, false);
-                }
-                TextView tView = newView.findViewById(R.id.textGoesHere);
-                String setText= String.valueOf(elements.get(position).text);
-                tView.setText(setText);
-                String urgentValue = elements.get(position).urgent;
-                if (urgentValue.equals("true")) {
-                    tView.setBackgroundColor(Color.RED);
-                    tView.setTextColor(Color.WHITE);
-                } else {
-                    tView.setBackgroundColor(Color.WHITE);
-                    tView.setTextColor(Color.BLACK);
-                }
-                return newView;
-            }
-        }
-        //----------------Back to main-------------------------------
-
-
-
-        ListView todolist = findViewById(R.id.toDoList);
-        MyListAdapter myAdapter = new MyListAdapter();
-        todolist.setAdapter(myAdapter);
-        Button addButton = findViewById(R.id.button);
-        Switch sw = findViewById(R.id.urgent);
-        sw.setChecked(false);
-
-        //----------------Create new task---------------------------
-        addButton.setOnClickListener(click ->
-        {
-            EditText addElement = findViewById(R.id.typeHere);
-            String newTask = addElement.getText().toString();
-            String newUrgent = String.valueOf(sw.isChecked());
-            addElement.setText(null);
-            db.insertTask(newTask,newUrgent);
-            resetElements();
-            if (sw.isChecked()) {
-                sw.setChecked(false);
-            }
-            myAdapter.notifyDataSetChanged();
-        });
-
-        //-----------------Delete Function --------------------
-        todolist.setOnItemLongClickListener( (parent, view, position, id) -> {
-            View extraViewStuff = getLayoutInflater().inflate(R.layout.row_layout, null) ;
-            String extraText = R.string.rowline + String.valueOf(position);
-            ((TextView)extraViewStuff.findViewById(R.id.textGoesHere)).setText(extraText);
-
-
-            AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
-            aDialog.setMessage(R.string.delete)
-                    .setPositiveButton(R.string.yes, (click, arg) -> {
-                        db.deleteTask(elements.get(position).id);
-                        resetElements();
-                        myAdapter.notifyDataSetChanged();
-                    })
-                    .setNegativeButton(R.string.no, (click, arg) -> {
-                    })
-                    .setView(extraViewStuff)
-                    .create()
-                    .show();
-            return true;
-        });
-
-        //-------------Refresh-----------------------------------------------
-        SwipeRefreshLayout swipeRefresh = findViewById(R.id.swiperefresh);
-        swipeRefresh.setOnRefreshListener(()-> swipeRefresh.setRefreshing(false));
-
+        DuckImages duckImages = new DuckImages();
+        duckImages.execute("https://random-d.uk/api/v2/random?type=jpg");
     }
 
-    protected void resetElements() {
-        elements.clear();
-        taskList = db.getAllTask();
-        idlist = db.getAllId();
-        urgentlist = db.getAllUrgent();
-        int listSize = db.numberOfRows();
-        for (int i = 0; i < listSize; i++) {
-            object obj = new object(idlist.get(i), taskList.get(i), urgentlist.get(i));
-            elements.add(obj);
+    private class DuckImages extends AsyncTask<String, Integer, Void> {
+
+
+        public Void doInBackground(String ... args) {
+            while (true) {
+                Bitmap photo;
+                ImageView duckImageView = findViewById(R.id.imageView);
+                try {
+                    URL url = new URL(args[0]);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    //wait for data
+                    InputStream response = conn.getInputStream();
+                    //load JSON
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
+                    StringBuilder sb = new StringBuilder();
+
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    String result = sb.toString();
+
+                    //create JSON object
+                    JSONObject object = new JSONObject(result);
+
+                    //get photo URL
+                    URL photoUrl = new URL(object.getString("url"));
+                    String filename = object.getString("url");
+                    System.out.println(filename);
+
+                    //check if file exists
+                    File file = new File(getFilesDir(), filename);
+                    if (file.exists()) {
+                        photo = BitmapFactory.decodeFile(getFilesDir() + filename);
+                        duckImageView.setImageBitmap(photo);
+
+                    } else {
+
+                        //download photo
+                        HttpURLConnection connection = (HttpURLConnection) photoUrl.openConnection();
+                        connection.setDoInput(true);
+                        connection.connect();
+                        InputStream input = connection.getInputStream();
+
+                        // Decode the input stream into a Bitmap object
+                        photo = BitmapFactory.decodeStream(input);
+                        duckImageView.setImageBitmap(photo);
+
+
+                        System.out.println("input: " + input.toString());
+                        FileOutputStream outputStream = openFileOutput(getFilesDir() + filename, Context.MODE_PRIVATE);
+                        photo.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("------------------" + e);
+                }
+
+                for (int j = 0; j < 100; j++) {
+                    try {
+                        publishProgress(j);
+                        Thread.sleep(30);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        public void onProgressUpdate (Integer ... values) {
+            ProgressBar progressBar = findViewById(R.id.progressBar);
+            super.onProgressUpdate(values);
+            progressBar.setProgress(values[0]);
+        }
+
+        public void onPostExecute (Void done) {
         }
     }
 }
