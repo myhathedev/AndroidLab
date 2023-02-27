@@ -1,6 +1,9 @@
 package com.example.androidlabs;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.BufferedReader;
@@ -9,103 +12,134 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Array;
+import java.util.ArrayList;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-//---------------------On create-----------------------
+    //---------------------On create-----------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getNameList getNameList = new getNameList();
+        getNameList.execute("https://swapi.dev/api/people/?format=json");
 
-        DuckImages duckImages = new DuckImages();
-        duckImages.execute("https://random-d.uk/api/v2/random?type=jpg");
     }
 
-    private class DuckImages extends AsyncTask<String, Integer, Void> {
+    //---------------------get list from API-------------------------------------
+    private class getNameList extends AsyncTask<String, Integer, ArrayList<character>> {
+        public ArrayList<character> doInBackground(String... args) {
+            URL url = null;
+            ArrayList<character> nameList = new ArrayList<>();
+            try {
+                url = new URL(args[0]);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                //wait for data
+                InputStream response = conn.getInputStream();
+                //load JSON
+                BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
+                StringBuilder sb = new StringBuilder();
 
-
-        public Void doInBackground(String ... args) {
-            while (true) {
-                Bitmap photo;
-                ImageView duckImageView = findViewById(R.id.imageView);
-                try {
-                    URL url = new URL(args[0]);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    //wait for data
-                    InputStream response = conn.getInputStream();
-                    //load JSON
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(response, "UTF-8"), 8);
-                    StringBuilder sb = new StringBuilder();
-
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line + "\n");
-                    }
-                    String result = sb.toString();
-
-                    //create JSON object
-                    JSONObject object = new JSONObject(result);
-
-                    //get photo URL
-                    URL photoUrl = new URL(object.getString("url"));
-                    String filename = object.getString("url");
-                    System.out.println(filename);
-
-                    //check if file exists
-                    File file = new File(getFilesDir(), filename);
-                    if (file.exists()) {
-                        photo = BitmapFactory.decodeFile(getFilesDir() + filename);
-                        duckImageView.setImageBitmap(photo);
-
-                    } else {
-
-                        //download photo
-                        HttpURLConnection connection = (HttpURLConnection) photoUrl.openConnection();
-                        connection.setDoInput(true);
-                        connection.connect();
-                        InputStream input = connection.getInputStream();
-
-                        // Decode the input stream into a Bitmap object
-                        photo = BitmapFactory.decodeStream(input);
-                        duckImageView.setImageBitmap(photo);
-
-
-                        System.out.println("input: " + input.toString());
-                        FileOutputStream outputStream = openFileOutput(getFilesDir() + filename, Context.MODE_PRIVATE);
-                        photo.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                        outputStream.flush();
-                        outputStream.close();
-                    }
-
-                } catch (Exception e) {
-                    System.out.println("------------------" + e);
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
                 }
+                String result = sb.toString();
 
-                for (int j = 0; j < 100; j++) {
-                    try {
-                        publishProgress(j);
-                        Thread.sleep(30);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                //create JSON object and the ArrayList
+                JSONObject object = new JSONObject(result);
+                System.out.println(result + "--------------------------");
+                JSONArray results = object.getJSONArray("results");
+                System.out.println(results);
+
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject jcharacter = results.getJSONObject(i);
+                    String name = jcharacter.getString("name");
+                    String height = jcharacter.getString("height");
+                    String mass = jcharacter.getString("mass");
+                    character character = new character(name, height, mass);
+                    nameList.add(character);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("-------------------Failed to connect");
+            }
+            return nameList;
+        }
+
+        public void onProgressUpdate(Integer... values) {
+        }
+
+        public void onPostExecute(ArrayList<character> characterList) {
+            //   ------------------Adapter----------------------------
+            class MyListAdapter extends BaseAdapter {
+                public int getCount() {
+                    return characterList.size();
+                }
+                public Object getItem(int position) {
+                    return position;
+                }
+                public long getItemId(int position) {
+                    return (long) position;
+                }
+                public View getView(int position, View old, ViewGroup parent) {
+                    View newView = old;
+                    LayoutInflater inflater = getLayoutInflater();
+                    if (newView == null) {
+                        newView = inflater.inflate(R.layout.row_layout, parent, false);
                     }
+                    TextView tView = newView.findViewById(R.id.textGoesHere);
+                    tView.setText(characterList.get(position).name);
+                    return newView;
                 }
             }
-        }
 
-        public void onProgressUpdate (Integer ... values) {
-            ProgressBar progressBar = findViewById(R.id.progressBar);
-            super.onProgressUpdate(values);
-            progressBar.setProgress(values[0]);
-        }
+            ListView nameListView = findViewById(R.id.nameList);
+            MyListAdapter myAdapter = new MyListAdapter();
+            nameListView.setAdapter(myAdapter);
 
-        public void onPostExecute (Void done) {
+            nameListView.setOnItemClickListener( (parent, view, position, id) -> {
+                Bundle dataToPass = new Bundle();
+                dataToPass.putString("name",characterList.get(position).name);
+                dataToPass.putString("height",characterList.get(position).height);
+                dataToPass.putString("mass",characterList.get(position).mass);
+                System.out.println(characterList.get(position).name);
+
+                FrameLayout isTablet = findViewById(R.id.fragmentLocation);
+
+                if (isTablet!=null) {
+                    DetailsFragment fragment = new DetailsFragment();
+                    fragment.setArguments(dataToPass);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.fragmentLocation, fragment).commit();
+                }  else {
+                    Intent empty = new Intent(MainActivity.this,EmptyActivity.class);
+                    empty.putExtras(dataToPass);
+                    System.out.println(dataToPass);
+                    startActivity(empty);
+                }
+
+            });
+
         }
     }
+
 }

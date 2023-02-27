@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:text="Name: "
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/fill_me1"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:text="fill_me"
+        android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@+id/name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/height"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:text="Height: "
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <TextView
+        android:id="@+id/fill_me2"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:text="fill_me"
+        android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@+id/height"
+        app:layout_constraintTop_toBottomOf="@+id/fill_me1" />
+
+    <TextView
+        android:id="@+id/mass"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:text="Mass: "
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/height" />
+
+    <TextView
+        android:id="@+id/fill_me3"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:text="fill_me"
+        android:textSize="20dp"
+        app:layout_constraintStart_toEndOf="@+id/mass"
+        app:layout_constraintTop_toBottomOf="@+id/fill_me2" />
+</androidx.constraintlayout.widget.ConstraintLayout>
