@@ -12,4 +12,10 @@
     <string name="delete">Voulez-vous supprimer ceci ?</string>
     <string name="yes">Qui</string>
     <string name="no">Non</string>
+    <string name="dad_joke">Pourquoi les scientifiques ne font-ils pas confiance aux atomes ? \n Parce qu\'ils constituent tout ce qui existe.</string>
+    <string name="home">Accueil</string>
+    <string name="joke">Blagues de papa</string>
+    <string name="exit">Sortie</string>
+    <string name="open">Open navigation drawer</string>
+    <string name="close">Close navigation drawer</string>
 </resources>
